@@ -1,0 +1,35 @@
+{
+  "name": "rss-reader",
+  "version": "0.1.0",
+  "description": "RSS reader as a Hexlet student project",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/k-vinogradov/project-lvl3-s452.git"
+  },
+  "keywords": [
+    "rss",
+    "rss-reader",
+    "hexlet",
+    "practice"
+  ],
+  "author": "Konstantin Vinogradov <mail@k-vinogradov.ru>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/k-vinogradov/project-lvl3-s452/issues"
+  },
+  "homepage": "https://github.com/k-vinogradov/project-lvl3-s452#readme",
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-babel": "^5.3.0",
+    "eslint-plugin-import": "^2.17.2",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1"
+  }
+}
