@@ -1,0 +1,12 @@
+before_install:
+  - make install
+script:
+  - make lint
+  - make build
+deploy:
+  provider: surge
+  project: ./dist/
+  domain: rss-reader.k-vinogradov.ru
+  skip_cleanup: true
+  on:
+    tags: true
