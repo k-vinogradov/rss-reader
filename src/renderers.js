@@ -1,23 +1,37 @@
 import WatchJS from 'melanke-watchjs';
 
 const renderForm = (state) => {
-  const renderInvalidForm = () => {
-    const input = document.getElementById('feed-url-input');
-    if (state.formValue.length === 0) input.classList.remove('is-invalid');
-    else input.classList.add('is-invalid');
-    document.getElementById('add-feed-button').disabled = true;
+  const input = document.getElementById('feed-url-input');
+  const button = document.getElementById('add-feed-button');
+
+  const formRenderersMap = {
+    init: () => {
+      input.classList.remove('is-invalid');
+      input.value = '';
+      button.disabled = true;
+    },
+    invalid: () => {
+      input.classList.add('is-invalid');
+      input.value = state.formState.value;
+      button.disabled = true;
+    },
+    valid: () => {
+      input.classList.remove('is-invalid');
+      input.value = state.formState.value;
+      button.disabled = false;
+    },
   };
 
-  const renderValidForm = () => {
-    document.getElementById('feed-url-input').classList.remove('is-invalid');
-    document.getElementById('add-feed-button').disabled = false;
-  };
+  formRenderersMap[state.formState.state]();
+};
 
-  (state.formIsValid ? renderValidForm : renderInvalidForm)();
+const renderFeeds = (state) => {
+  state.feeds.forEach(({ uid, url }) => console.log(`${uid} : ${url}`));
 };
 
 const enable = (state) => {
-  WatchJS.watch(state, ['formIsValid', 'formValue'], () => renderForm(state));
+  WatchJS.watch(state, 'formState', () => renderForm(state));
+  WatchJS.watch(state, 'feeds', () => renderFeeds(state));
   renderForm(state);
 };
 

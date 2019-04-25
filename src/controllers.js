@@ -1,17 +1,28 @@
+import _ from 'lodash';
 import isURL from 'validator/lib/isURL';
 
+const resetFormState = (state) => {
+  state.formState = { state: 'init', value: '' };
+};
+
 const handleFormInput = ({ target }, state) => {
+  const isValid = value => isURL(value) && !state.feeds.map(({ url }) => url).includes(value);
+
+  const newState = (value) => {
+    if (value.length === 0) return 'init';
+    return isValid(value) ? 'valid' : 'invalid';
+  };
   const { value } = target;
-  state.formIsValid = isURL(value) && !state.feedURLs.includes(value);
-  state.formValue = value;
+  state.formState = { state: newState(value), value };
 };
 
 const handleFormSubmit = (event, state) => {
   event.preventDefault();
-  if (!state.formIsValid) return;
-  state.feedURLs.push(state.formValue);
-  state.formValue = '';
-  state.formState = 'invalid';
+  if (state.formState.state !== 'valid') return;
+  const uid = _.uniqueId();
+  const url = state.formState.value;
+  state.feeds.push({ uid, url, state: 'new' });
+  resetFormState(state);
 };
 
 const enable = (state) => {

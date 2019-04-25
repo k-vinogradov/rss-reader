@@ -3,9 +3,11 @@ import enableControllers from './controllers';
 
 const app = () => {
   const state = {
-    formIsValid: false,
-    formValue: '',
-    feedURLs: [],
+    formState: {
+      state: 'init',
+      formValue: '',
+    },
+    feeds: [],
   };
 
   enableRenderers(state);
