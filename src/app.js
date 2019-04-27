@@ -7,7 +7,11 @@ const app = () => {
       state: 'init',
       formValue: '',
     },
-    feeds: [],
+    feeds: {
+      allUIDs: [],
+      byUID: {},
+    },
+    feedDetailToShow: null,
   };
 
   enableRenderers(state);

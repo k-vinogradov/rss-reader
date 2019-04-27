@@ -12,24 +12,45 @@
             skills.
           </p>
           <hr class="my-4" />
-          <form id="add-feed-form">
+          <form id="addFeedForm">
             <div class="input-group">
               <input
                 type="text"
-                id="feed-url-input"
+                id="addFeedInput"
                 class="form-control"
                 placeholder="Enter RSS feed URL"
                 aria-label="RSS feed"
-                aria-describedby="add-feed-button"
+                aria-describedby="addFeedButton"
               />
               <div class="input-group-append">
-                <button class="btn btn-primary" type="submit" id="add-feed-button">
+                <button class="btn btn-primary" type="submit" id="addFeedButton">
                   Add
                 </button>
               </div>
             </div>
           </form>
       </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col" id="feedsDataContainer"></div>
+    </div>
+    <div class="row">
+      <div class="modal fade" id="feedDetail" tabindex="-1" role="dialog" aria-labelledby="feedDetailLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="feedDetailLabel"></h5>
+              <button type="button" class="close" aria-label="Close" id="closeFeedDetailHeaderButton">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body" id="feedDetailBody"></div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" id="closeFeedDetailButton">Close</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </body>
