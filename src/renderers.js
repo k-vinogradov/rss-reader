@@ -116,7 +116,7 @@ const renderFeedDetail = ({ feedDetailToShow }) => {
   }
   const { title, description } = feedDetailToShow;
   document.getElementById('feedDetailLabel').textContent = title;
-  document.getElementById('feedDetailBody').textContent = description;
+  document.getElementById('feedDetailBody').innerHTML = description;
   $('#feedDetail').modal('show');
 };
 
