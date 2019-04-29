@@ -2,9 +2,17 @@ import _ from 'lodash';
 import isURL from 'validator/lib/isURL';
 import load from './loader';
 
-const resetFormState = (state) => {
-  state.formState = { state: 'init', value: '' };
+const setState = (state, path, value) => {
+  /*
+    WatchJS doesn't check if the actual values have been changed. It causes event triggering
+    if the new object with the same content has been added. So we need some wrapper to avoid
+    such false events.
+  */
+  if (_.isEqual(_.get(state, path), value)) return;
+  _.set(state, path, value);
 };
+
+const resetFormState = state => setState(state, 'formState', { state: 'init', value: '' });
 
 const handleFormInput = ({ target }, state) => {
   const isValid = (value) => {
@@ -18,44 +26,65 @@ const handleFormInput = ({ target }, state) => {
   };
 
   const { value } = target;
-  state.formState = { state: newState(value), value };
+  setState(state, 'formState', { state: newState(value), value });
 };
 
-const loadFeed = (feeds, uid) => {
+const loadFeed = (state, uid) => {
+  const { feeds } = state;
   const feed = feeds.byUID[uid];
-  console.log(`Controller tries to load feed ${feed.url}`);
+  const path = `feeds.byUID.${uid}`;
   load(feed.url)
-    .then((parsed) => {
-      console.log('Store parsed feed data to the state');
-      feeds.byUID = {
-        ...feeds.byUID,
-        [uid]: { ...feed, ...parsed, status: 'complete' },
-      };
-    })
+    .then(parsed => setState(state, path, { ...feed, ...parsed, status: 'complete' }))
     .catch((error) => {
       console.log(error);
-      setTimeout(() => loadFeed(feeds, uid), 10000);
+      setTimeout(() => loadFeed(state, uid), 10000);
     });
 };
 
 const handleFormSubmit = (event, state) => {
   event.preventDefault();
   if (state.formState.state !== 'valid') return;
-  const uid = _.uniqueId();
+  const uid = `feed${_.uniqueId()}`;
   const url = state.formState.value;
-  state.feeds.allUIDs.push(uid);
-  state.feeds.byUID[uid] = { uid, url, status: 'new' };
+  const feed = { uid, url, status: 'new' };
+  setState(state, 'feeds', {
+    allUIDs: [...state.feeds.allUIDs, uid],
+    byUID: { ...state.feeds.byUID, [uid]: feed },
+  });
   resetFormState(state);
-  loadFeed(state.feeds, uid);
+  loadFeed(state, uid);
 };
 
-const showFeedDetail = (state, title, description) => {
-  console.log(state);
-  state.feedDetailToShow = { title, description };
-};
+const showFeedDetail = (state, title, description) => setState(state, 'feedDetailToShow', { title, description });
 
 const resetFeedDetail = (state) => {
   state.feedDetailToShow = null;
+};
+
+const updateFeeds = (state) => {
+  console.log('Time to update out feeds...');
+  const { feeds } = state;
+  const updatingTasks = feeds.allUIDs
+    .map(uid => feeds.byUID[uid])
+    .filter(feed => feed.status === 'complete')
+    .map(feed => load(feed.url)
+      .then(parsed => ({ ...feed, content: _.union(feed.content, parsed.content) }))
+      .then(updated => ({ [feed.uid]: updated }))
+      .catch((error) => {
+        console.log(error);
+        return undefined;
+      }));
+  Promise.all(updatingTasks)
+    .then((updatedFeeds) => {
+      const updatedData = updatedFeeds
+        .filter(item => item !== undefined)
+        .reduce((acc, feed) => ({ ...acc, ...feed }), {});
+      setState(state, 'feeds.byUID', { ...feeds.byUID, ...updatedData });
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+    .then(() => setTimeout(() => updateFeeds(state), 5000));
 };
 
 const enable = (state) => {
@@ -65,10 +94,13 @@ const enable = (state) => {
   document
     .getElementById('addFeedInput')
     .addEventListener('input', event => handleFormInput(event, state));
-  document.getElementById('closeFeedDetailButton').addEventListener('click', () => resetFeedDetail(state));
+  document
+    .getElementById('closeFeedDetailButton')
+    .addEventListener('click', () => resetFeedDetail(state));
   document
     .getElementById('closeFeedDetailHeaderButton')
     .addEventListener('click', () => resetFeedDetail(state));
+  setTimeout(() => updateFeeds(state), 5000);
 };
 
 export default enable;

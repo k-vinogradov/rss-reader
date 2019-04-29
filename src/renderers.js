@@ -120,6 +120,7 @@ const renderFeedDetail = ({ feedDetailToShow }) => {
   $('#feedDetail').modal('show');
 };
 
+
 const enable = (state) => {
   WatchJS.watch(state, 'formState', () => renderForm(state));
   WatchJS.watch(state, 'feeds', () => renderAllFeeds(state));

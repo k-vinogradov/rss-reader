@@ -3,7 +3,7 @@ import axios from 'axios';
 const proxyUrl = url => `https://cors-anywhere.herokuapp.com/${url}`;
 
 const querySingleNode = (node, selector) => {
-  // TODO: querySelectorAll is quite slow. Makes sense to refactor.
+  // TODO: querySelectorAll is quite slow. Replace with something
 
   const nodes = node.querySelectorAll(selector);
   if (nodes.length !== 1) {
@@ -13,7 +13,6 @@ const querySingleNode = (node, selector) => {
 };
 
 const parse = (xmlString) => {
-  console.log('Parsing XML data');
   const parser = new DOMParser();
   const doc = parser.parseFromString(xmlString, 'application/xml');
 
@@ -28,13 +27,11 @@ const parse = (xmlString) => {
       description: querySingleNode(item, 'description').textContent,
     })),
   };
-  console.log(result);
   return result;
 };
 
 const load = (url) => {
   const wrapped = proxyUrl(url);
-  console.log(`Load proxy page ${wrapped}`);
   return axios.get(wrapped).then(({ status, statusText, data }) => {
     if (status !== 200) throw Error(`Status ${status} (${statusText}) received`);
     return parse(data);
