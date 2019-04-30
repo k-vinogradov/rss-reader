@@ -3,12 +3,6 @@
   "version": "0.1.0",
   "description": "RSS reader as a Hexlet student project",
   "private": true,
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint .",
-    "build": "webpack",
-    "dev-server": "webpack-dev-server --open"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/k-vinogradov/project-lvl3-s452.git"

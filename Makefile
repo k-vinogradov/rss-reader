@@ -1,11 +1,11 @@
 install:
-	@npm install
+	npm install
 
 lint:
-	@npm run lint
+	npx eslint .
 
 build:
-	@npm run build
+	npx webpack
 
 run-dev-server:
-	@npm run dev-server
+	npx webpack-dev-server --open
