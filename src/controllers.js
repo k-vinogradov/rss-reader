@@ -17,7 +17,7 @@ const getUrlUID = url => btoa(url);
 const resetFormState = state => setState(state, 'formState', { state: 'init', value: '' });
 
 const handleFormInput = ({ target }, state) => {
-  const isValid = value => isURL(value) && !state.feed.allUIDs.includes(getUrlUID(value));
+  const isValid = value => isURL(value) && !state.feeds.allUIDs.includes(getUrlUID(value));
 
   const newState = (value) => {
     if (value.length === 0) return 'init';
