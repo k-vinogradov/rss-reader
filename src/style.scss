@@ -1,1 +1,38 @@
-@import "~bootstrap/scss/bootstrap";
+@import '~bootstrap/scss/bootstrap';
+
+// h2 {
+//   @extend .display-4;
+// }
+
+// .spinner {
+//   @extend .spinner-border, .spinner-border-sm;
+// }
+
+div#feedsDataContainer {
+  ul {
+    @extend .list-group, .list-group-flush;
+    li.feed {
+      @extend .list-group-item;
+      button {
+        @extend .btn, .btn-light, .btn-sm, .my-1, .mx-3;
+      }
+      h2 {
+        @extend .h4;
+      }
+      ul {
+          @extend .container;
+      }
+      .url {
+        @extend .small;
+      }
+      .spinner {
+        @extend .spinner-border, .spinner-border-sm, .mr-2;
+      }
+    }
+    li.errorFeed {
+      h2 {
+        @extend .text-danger;
+      }
+    }
+  }
+}

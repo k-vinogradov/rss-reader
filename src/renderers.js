@@ -2,14 +2,24 @@ import WatchJS from 'melanke-watchjs';
 // eslint-disable-next-line no-unused-vars
 import Modal from 'bootstrap/js/dist/modal';
 import $ from 'jquery';
-import { showFeedDetail } from './controllers';
+import { showFeedDetail, reloadFeed } from './controllers';
 
-const appendChildren = (node, ...children) => children.forEach(child => node.appendChild(child));
+const createElement = (tag, text = '', ...classes) => {
+  const element = document.createElement(tag);
+  if (text.length > 0) element.textContent = text;
+  if (classes.length > 0) element.classList.add(...classes);
+
+  return element;
+};
+
+const buildTree = (root, ...children) => {
+  children.forEach(child => root.appendChild(child));
+  return root;
+};
 
 const renderForm = ({ formState }) => {
   const input = document.getElementById('addFeedInput');
   const button = document.getElementById('addFeedButton');
-
   const formRenderersMap = {
     init: () => {
       input.classList.remove('is-invalid');
@@ -31,71 +41,55 @@ const renderForm = ({ formState }) => {
   formRenderersMap[formState.state]();
 };
 
-const renderNewFeed = ({ uid, url }) => {
-  console.log('Render new feed');
-  const feed = document.createElement('div');
-  feed.id = `feed-container-${uid}`;
-  feed.classList.add('container');
+const renderNewFeed = ({ url }) => buildTree(
+  createElement('li', '', 'feed'),
+  createElement('h2', 'Loading Feed'),
+  buildTree(
+    createElement('div', '', 'url'),
+    createElement('span', '', 'spinner'),
+    createElement('span', url),
+  ),
+);
 
-  const header = document.createElement('div');
-  header.classList.add('d-flex', 'align-items-center', 'h2');
-
-  const title = document.createElement('span');
-  title.textContent = 'Loading...';
-
-  const spinner = document.createElement('div');
-  spinner.classList.add('spinner-border', 'ml-auto');
-
-  appendChildren(header, title, spinner);
-
-  const content = document.createElement('p');
-  content.textContent = url;
-
-  appendChildren(feed, header, content);
-  return feed;
-};
-
-const renderDetailButton = (title, description, state) => {
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.classList.add('btn', 'btn-light');
-  button.textContent = '?';
-  button.addEventListener('click', () => showFeedDetail(state, title, description));
-  return button;
+const renderErrorFeed = ({ uid, url, error }, state) => {
+  const button = createElement('button', 'Reload');
+  button.addEventListener('click', () => reloadFeed(uid, state));
+  return buildTree(
+    createElement('li', '', 'feed', 'errorFeed'),
+    createElement('h2', 'Invalid Feed'),
+    createElement('small', url),
+    buildTree(
+      createElement('p'),
+      createElement('span', 'Failed to read RSS data due the following reason: '),
+      createElement('strong', error),
+    ),
+    button,
+  );
 };
 
 const renderListItem = ({ title, link, description }, state) => {
-  const listItem = document.createElement('li');
-  const anchor = document.createElement('a');
-  anchor.textContent = title;
+  const detailButton = createElement('button', 'Detail...');
+  detailButton.addEventListener('click', () => showFeedDetail(state, title, description));
+  const anchor = createElement('a', title);
   anchor.href = link;
-  appendChildren(listItem, anchor, renderDetailButton(title, description, state));
-  return listItem;
+  return buildTree(createElement('li'), anchor, detailButton);
 };
 
-const renderCompleteFeed = ({ title, description, content }, state) => {
-  console.log('Render complete feed');
-  const feedElement = document.createElement('div');
-  feedElement.classList.add('container');
-
-  const header = document.createElement('h2');
-  header.textContent = title;
-
-  const descriptionParagraph = document.createElement('p');
-  descriptionParagraph.textContent = description;
-
-  const contentList = document.createElement('ul');
-  content.map(item => renderListItem(item, state)).forEach(item => contentList.appendChild(item));
-
-  appendChildren(feedElement, header, descriptionParagraph, contentList);
-  return feedElement;
-};
+const renderCompleteFeed = ({
+  title, description, content, url,
+}, state) => buildTree(
+  createElement('li', '', 'feed'),
+  createElement('h2', title),
+  createElement('small', url),
+  createElement('p', description),
+  buildTree(createElement('ul'), ...content.map(item => renderListItem(item, state))),
+);
 
 const renderFeed = (feed, state) => {
-  console.log('Render all feeds');
   const { status } = feed;
   const renderersMap = {
-    new: renderNewFeed,
+    loading: renderNewFeed,
+    error: renderErrorFeed,
     complete: renderCompleteFeed,
   };
   return renderersMap[status](feed, state);
@@ -104,9 +98,13 @@ const renderFeed = (feed, state) => {
 const renderAllFeeds = (state) => {
   const container = document.getElementById('feedsDataContainer');
   while (container.firstChild) container.removeChild(container.firstChild);
-  state.feeds.allUIDs
-    .map(uid => renderFeed(state.feeds.byUID[uid], state))
-    .forEach(node => container.appendChild(node));
+  buildTree(
+    container,
+    buildTree(
+      document.createElement('ul'),
+      ...state.feeds.allUIDs.map(uid => renderFeed(state.feeds.byUID[uid], state)),
+    ),
+  );
 };
 
 const renderFeedDetail = ({ feedDetailToShow }) => {
@@ -119,7 +117,6 @@ const renderFeedDetail = ({ feedDetailToShow }) => {
   document.getElementById('feedDetailBody').innerHTML = description;
   $('#feedDetail').modal('show');
 };
-
 
 const enable = (state) => {
   WatchJS.watch(state, 'formState', () => renderForm(state));

@@ -2,6 +2,8 @@ import _ from 'lodash';
 import isURL from 'validator/lib/isURL';
 import load from './loader';
 
+const listUpdateInterval = 5000;
+
 const setState = (state, path, value) => {
   /*
     WatchJS doesn't check if the actual values have been changed. It causes event triggering
@@ -34,10 +36,12 @@ const loadFeed = (state, uid) => {
   const path = `feeds.byUID.${uid}`;
   load(feed.url)
     .then(parsed => setState(state, path, { ...feed, ...parsed, status: 'complete' }))
-    .catch((error) => {
-      console.log(error);
-      setTimeout(() => loadFeed(state, uid), 10000);
-    });
+    .catch(error => setState(state, path, { ...feed, error: error.message, status: 'error' }));
+};
+
+const reloadFeed = (uid, state) => {
+  setState(state, `feeds.byUID.${uid}.status`, 'loading');
+  loadFeed(state, uid);
 };
 
 const handleFormSubmit = (event, state) => {
@@ -45,7 +49,7 @@ const handleFormSubmit = (event, state) => {
   if (state.formState.state !== 'valid') return;
   const url = state.formState.value;
   const uid = getUrlUID(url);
-  const feed = { uid, url, status: 'new' };
+  const feed = { uid, url, status: 'loading' };
   setState(state, 'feeds', {
     allUIDs: [...state.feeds.allUIDs, uid],
     byUID: { ...state.feeds.byUID, [uid]: feed },
@@ -61,17 +65,17 @@ const resetFeedDetail = (state) => {
 };
 
 const updateFeeds = (state) => {
-  console.log('Time to update out feeds...');
   const { feeds } = state;
   const updatingTasks = feeds.allUIDs
     .map(uid => feeds.byUID[uid])
     .filter(feed => feed.status === 'complete')
     .map(feed => load(feed.url)
-      .then(parsed => ({ ...feed, content: _.union(feed.content, parsed.content) }))
+      .then(parsed => ({
+        ...feed,
+        content: _.unionWith(feed.content, parsed.content, _.isEqual),
+      }))
       .then(updated => ({ [feed.uid]: updated }))
-      .catch((error) => {
-        console.log(error);
-      }));
+      .catch(() => {}));
   Promise.all(updatingTasks)
     .then((updatedFeeds) => {
       const updatedData = updatedFeeds
@@ -79,10 +83,7 @@ const updateFeeds = (state) => {
         .reduce((acc, feed) => ({ ...acc, ...feed }), {});
       setState(state, 'feeds.byUID', { ...feeds.byUID, ...updatedData });
     })
-    .catch((error) => {
-      console.log(error);
-    })
-    .then(() => setTimeout(() => updateFeeds(state), 5000));
+    .finally(() => setTimeout(() => updateFeeds(state), listUpdateInterval));
 };
 
 const enable = (state) => {
@@ -98,8 +99,8 @@ const enable = (state) => {
   document
     .getElementById('closeFeedDetailHeaderButton')
     .addEventListener('click', () => resetFeedDetail(state));
-  setTimeout(() => updateFeeds(state), 5000);
+  setTimeout(() => updateFeeds(state), listUpdateInterval);
 };
 
 export default enable;
-export { showFeedDetail };
+export { showFeedDetail, reloadFeed };
