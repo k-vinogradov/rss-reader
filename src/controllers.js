@@ -6,7 +6,7 @@ const setState = (state, path, value) => {
   /*
     WatchJS doesn't check if the actual values have been changed. It causes event triggering
     if the new object with the same content has been added. So we need some wrapper to avoid
-    such false events.
+    such false runnings.
   */
   if (_.isEqual(_.get(state, path), value)) return;
   _.set(state, path, value);
@@ -16,8 +16,9 @@ const resetFormState = state => setState(state, 'formState', { state: 'init', va
 
 const handleFormInput = ({ target }, state) => {
   const isValid = (value) => {
-    const { feeds } = state;
-    return isURL(value) && !feeds.allUIDs.map(uid => feeds.byUID[uid].url).includes(value);
+    if (!isURL(value)) return false;
+    const feeds = state.feeds.byUID;
+    return !_.findKey(feeds, feed => feed.url === value);
   };
 
   const newState = (value) => {
