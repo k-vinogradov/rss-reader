@@ -60,8 +60,8 @@ const handleFormSubmit = (event, state) => {
 
 const showFeedDetail = (state, title, description) => setState(state, 'feedDetailToShow', { title, description });
 
-const resetFeedDetail = (state) => {
-  state.feedDetailToShow = null;
+const hideFeedDetail = (state) => {
+  setState(state, 'feedDetailToShow', null);
 };
 
 const updateFeeds = (state) => {
@@ -95,10 +95,10 @@ const enable = (state) => {
     .addEventListener('input', event => handleFormInput(event, state));
   document
     .getElementById('closeFeedDetailButton')
-    .addEventListener('click', () => resetFeedDetail(state));
+    .addEventListener('click', () => hideFeedDetail(state));
   document
     .getElementById('closeFeedDetailHeaderButton')
-    .addEventListener('click', () => resetFeedDetail(state));
+    .addEventListener('click', () => hideFeedDetail(state));
   setTimeout(() => updateFeeds(state), listUpdateInterval);
 };
 
