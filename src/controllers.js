@@ -60,9 +60,7 @@ const handleFormSubmit = (event, state) => {
 
 const showFeedDetail = (state, title, description) => setState(state, 'feedDetailToShow', { title, description });
 
-const hideFeedDetail = (state) => {
-  setState(state, 'feedDetailToShow', null);
-};
+const hideFeedDetail = state => setState(state, 'feedDetailToShow', null);
 
 const updateFeeds = (state) => {
   const { feeds } = state;
