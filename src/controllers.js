@@ -14,6 +14,11 @@ const setState = (state, path, value) => {
   _.set(state, path, value);
 };
 
+/*
+  Because of using lodath "path" syntax to access state in the setState() function
+  we can't use URL string as a key. We have to encode it by using hash/encoding
+  function. Base64 is a good one.
+*/
 const getUrlUID = url => btoa(url);
 
 const resetFormState = state => setState(state, 'formState', { state: 'init', value: '' });
