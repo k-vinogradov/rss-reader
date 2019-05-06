@@ -1,13 +1,5 @@
 @import '~bootstrap/scss/bootstrap';
 
-// h2 {
-//   @extend .display-4;
-// }
-
-// .spinner {
-//   @extend .spinner-border, .spinner-border-sm;
-// }
-
 div#feedsDataContainer {
   ul {
     @extend .list-group, .list-group-flush;

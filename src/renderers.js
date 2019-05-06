@@ -8,7 +8,6 @@ const createElement = (tag, text = '', ...classes) => {
   const element = document.createElement(tag);
   if (text.length > 0) element.textContent = text;
   if (classes.length > 0) element.classList.add(...classes);
-
   return element;
 };
 
@@ -37,7 +36,6 @@ const renderForm = ({ formState }) => {
       button.disabled = false;
     },
   };
-
   formRenderersMap[formState.state]();
 };
 
