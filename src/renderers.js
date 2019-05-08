@@ -16,7 +16,7 @@ const buildTree = (root, ...children) => {
   return root;
 };
 
-const renderForm = ({ newUrlFormSate }) => {
+const renderForm = ({ addUrlFormState }) => {
   const input = document.getElementById('addFeedInput');
   const button = document.getElementById('addFeedButton');
   const formRenderersMap = {
@@ -27,16 +27,16 @@ const renderForm = ({ newUrlFormSate }) => {
     },
     invalid: () => {
       input.classList.add('is-invalid');
-      input.value = newUrlFormSate.value;
+      input.value = addUrlFormState.value;
       button.disabled = true;
     },
     valid: () => {
       input.classList.remove('is-invalid');
-      input.value = newUrlFormSate.value;
+      input.value = addUrlFormState.value;
       button.disabled = false;
     },
   };
-  formRenderersMap[newUrlFormSate.state]();
+  formRenderersMap[addUrlFormState.state]();
 };
 
 const renderNewFeed = ({ url }) => buildTree(
@@ -140,7 +140,7 @@ const renderFeedEditForm = ({ feedEditFormState }) => {
 };
 
 const enable = (state) => {
-  WatchJS.watch(state, 'newUrlFormSate', () => renderForm(state));
+  WatchJS.watch(state, 'addUrlFormState', () => renderForm(state));
   WatchJS.watch(state, 'feeds', () => renderAllFeeds(state));
   WatchJS.watch(state, 'feedDetailToShow', () => renderFeedDetail(state));
   WatchJS.watch(state, 'feedEditFormState', () => renderFeedEditForm(state));

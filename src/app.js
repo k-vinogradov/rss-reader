@@ -3,7 +3,7 @@ import enableControllers from './controllers';
 
 const app = () => {
   const state = {
-    newUrlFormSate: {
+    addUrlFormState: {
       state: 'init',
       formValue: '',
     },

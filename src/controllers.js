@@ -21,7 +21,7 @@ const setState = (state, path, value) => {
 */
 const getUrlUID = url => btoa(url);
 
-const resetNewUrlFormState = state => setState(state, 'newUrlFormSate', { state: 'init', value: '' });
+const resetNewUrlFormState = state => setState(state, 'addUrlFormState', { state: 'init', value: '' });
 
 const isURLValid = ({ feeds }, url) => isURL(url) && !feeds.allUIDs.includes(getUrlUID(url));
 
@@ -32,7 +32,7 @@ const handleFormInput = ({ target }, state) => {
   };
 
   const { value } = target;
-  setState(state, 'newUrlFormSate', { state: newState(value), value });
+  setState(state, 'addUrlFormState', { state: newState(value), value });
 };
 
 const loadFeed = (state, uid) => {
@@ -51,8 +51,8 @@ const reloadFeed = (uid, state) => {
 
 const handleFormSubmit = (event, state) => {
   event.preventDefault();
-  if (state.newUrlFormSate.state !== 'valid') return;
-  const url = state.newUrlFormSate.value;
+  if (state.addUrlFormState.state !== 'valid') return;
+  const url = state.addUrlFormState.value;
   const uid = getUrlUID(url);
   const feed = { uid, url, status: 'loading' };
   setState(state, 'feeds', {
