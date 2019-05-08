@@ -17,13 +17,17 @@ const parse = (xmlString) => {
       })),
     };
   } catch {
-    throw Error('Invalid RSS data');
+    return null;
   }
 };
 
 const load = (url) => {
   const proxyUrl = buildProxyUrl(url);
-  return axios.get(proxyUrl).then(({ data }) => parse(data));
+  return axios.get(proxyUrl).then(({ data }) => {
+    const feedObject = parse(data);
+    if (feedObject === null) throw Error('Invalid RSS data');
+    return feedObject;
+  });
 };
 
 export default load;

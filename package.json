@@ -1,6 +1,6 @@
 {
   "name": "rss-reader",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "RSS reader as a Hexlet student project",
   "private": true,
   "repository": {
