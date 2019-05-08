@@ -2,7 +2,7 @@ import WatchJS from 'melanke-watchjs';
 // eslint-disable-next-line no-unused-vars
 import Modal from 'bootstrap/js/dist/modal';
 import $ from 'jquery';
-import { showFeedDetail, reloadFeed } from './controllers';
+import { showFeedDetail, reloadFeed, openFeedEditForm } from './controllers';
 
 const createElement = (tag, text = '', ...classes) => {
   const element = document.createElement(tag);
@@ -16,7 +16,7 @@ const buildTree = (root, ...children) => {
   return root;
 };
 
-const renderForm = ({ formState }) => {
+const renderForm = ({ newUrlFormSate }) => {
   const input = document.getElementById('addFeedInput');
   const button = document.getElementById('addFeedButton');
   const formRenderersMap = {
@@ -27,16 +27,16 @@ const renderForm = ({ formState }) => {
     },
     invalid: () => {
       input.classList.add('is-invalid');
-      input.value = formState.value;
+      input.value = newUrlFormSate.value;
       button.disabled = true;
     },
     valid: () => {
       input.classList.remove('is-invalid');
-      input.value = formState.value;
+      input.value = newUrlFormSate.value;
       button.disabled = false;
     },
   };
-  formRenderersMap[formState.state]();
+  formRenderersMap[newUrlFormSate.state]();
 };
 
 const renderNewFeed = ({ url }) => buildTree(
@@ -50,8 +50,10 @@ const renderNewFeed = ({ url }) => buildTree(
 );
 
 const renderErrorFeed = ({ uid, url, error }, state) => {
-  const button = createElement('button', 'Reload');
-  button.addEventListener('click', () => reloadFeed(uid, state));
+  const reloadButton = createElement('button', 'Reload');
+  reloadButton.addEventListener('click', () => reloadFeed(uid, state));
+  const editButton = createElement('button', 'Edit');
+  editButton.addEventListener('click', () => openFeedEditForm(uid, state));
   return buildTree(
     createElement('li', '', 'feed', 'errorFeed'),
     createElement('h2', 'Invalid Feed'),
@@ -61,7 +63,8 @@ const renderErrorFeed = ({ uid, url, error }, state) => {
       createElement('span', 'Failed to read RSS data due the following reason: '),
       createElement('strong', error),
     ),
-    button,
+    editButton,
+    reloadButton,
   );
 };
 
@@ -116,10 +119,32 @@ const renderFeedDetail = ({ feedDetailToShow }) => {
   $('#feedDetail').modal('show');
 };
 
+const renderFeedEditModal = ({ showFeedEditForm }) => $('#feedUpdate').modal(showFeedEditForm ? 'show' : 'hide');
+
+const renderFeedEditForm = ({ feedEditFormState }) => {
+  const input = document.getElementById('feedUpdateInput');
+  const button = document.getElementById('updateFeedButton');
+  const formRenderersMap = {
+    invalid: () => {
+      input.classList.add('is-invalid');
+      input.value = feedEditFormState.value;
+      button.disabled = true;
+    },
+    valid: () => {
+      input.classList.remove('is-invalid');
+      input.value = feedEditFormState.value;
+      button.disabled = false;
+    },
+  };
+  formRenderersMap[feedEditFormState.state]();
+};
+
 const enable = (state) => {
-  WatchJS.watch(state, 'formState', () => renderForm(state));
+  WatchJS.watch(state, 'newUrlFormSate', () => renderForm(state));
   WatchJS.watch(state, 'feeds', () => renderAllFeeds(state));
   WatchJS.watch(state, 'feedDetailToShow', () => renderFeedDetail(state));
+  WatchJS.watch(state, 'feedEditFormState', () => renderFeedEditForm(state));
+  WatchJS.watch(state, 'showFeedEditForm', () => renderFeedEditModal(state));
   renderForm(state);
 };
 

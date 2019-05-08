@@ -35,6 +35,9 @@
     <div class="row">
       <div class="col" id="feedsDataContainer"></div>
     </div>
+    
+    <!-- FEED DETAIL MODAL -->
+    
     <div class="row">
       <div class="modal" id="feedDetail" tabindex="-1" role="dialog" aria-labelledby="feedDetailLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
@@ -53,5 +56,39 @@
         </div>
       </div>
     </div>
+    
+    <!-- UPDATE FEED FORM MODAL -->
+
+    <div class="row">
+      <div class="modal" id="feedUpdate" tabindex="-1" role="dialog" aria-labelledby="feedUpdateLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="feedUpdateLabel">Update Feed</h5>
+              <button type="button" class="close" aria-label="Close" id="closeFeedUpdateHeaderButton">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form id="feedUpdateForm">
+              <div class="modal-body">
+                <input
+                  type="text"
+                  id="feedUpdateInput"
+                  class="form-control"
+                  placeholder="Enter RSS feed URL"
+                  aria-label="RSS feed"
+                  aria-describedby="updateFeedButton"
+                />
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-primary" type="submit" id="updateFeedButton">Update</button>
+                <button type="button" class="btn btn-secondary" id="closeFeedUpdateButton">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </body>
 </html>

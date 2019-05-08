@@ -3,15 +3,21 @@ import enableControllers from './controllers';
 
 const app = () => {
   const state = {
-    formState: {
+    newUrlFormSate: {
       state: 'init',
       formValue: '',
+    },
+    feedEditFormState: {
+      state: 'valid',
+      formValue: '',
+      uid: '',
     },
     feeds: {
       allUIDs: [],
       byUID: {},
     },
     feedDetailToShow: null,
+    showFeedEditForm: false,
   };
 
   enableRenderers(state);

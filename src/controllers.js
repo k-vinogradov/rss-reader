@@ -21,18 +21,18 @@ const setState = (state, path, value) => {
 */
 const getUrlUID = url => btoa(url);
 
-const resetFormState = state => setState(state, 'formState', { state: 'init', value: '' });
+const resetNewUrlFormState = state => setState(state, 'newUrlFormSate', { state: 'init', value: '' });
+
+const isURLValid = ({ feeds }, url) => isURL(url) && !feeds.allUIDs.includes(getUrlUID(url));
 
 const handleFormInput = ({ target }, state) => {
-  const isValid = value => isURL(value) && !state.feeds.allUIDs.includes(getUrlUID(value));
-
   const newState = (value) => {
     if (value.length === 0) return 'init';
-    return isValid(value) ? 'valid' : 'invalid';
+    return isURLValid(state, value) ? 'valid' : 'invalid';
   };
 
   const { value } = target;
-  setState(state, 'formState', { state: newState(value), value });
+  setState(state, 'newUrlFormSate', { state: newState(value), value });
 };
 
 const loadFeed = (state, uid) => {
@@ -51,15 +51,15 @@ const reloadFeed = (uid, state) => {
 
 const handleFormSubmit = (event, state) => {
   event.preventDefault();
-  if (state.formState.state !== 'valid') return;
-  const url = state.formState.value;
+  if (state.newUrlFormSate.state !== 'valid') return;
+  const url = state.newUrlFormSate.value;
   const uid = getUrlUID(url);
   const feed = { uid, url, status: 'loading' };
   setState(state, 'feeds', {
     allUIDs: [...state.feeds.allUIDs, uid],
     byUID: { ...state.feeds.byUID, [uid]: feed },
   });
-  resetFormState(state);
+  resetNewUrlFormState(state);
   loadFeed(state, uid);
 };
 
@@ -89,21 +89,55 @@ const updateFeeds = (state) => {
     .finally(() => setTimeout(() => updateFeeds(state), listUpdateInterval));
 };
 
+const openFeedEditForm = (uid, state) => {
+  setState(state, 'feedEditFormState', {
+    state: 'valid',
+    value: state.feeds.byUID[uid].url,
+    uid,
+  });
+  setState(state, 'showFeedEditForm', true);
+};
+
+const closeFeedEditForm = state => setState(state, 'showFeedEditForm', false);
+
+const handleFeedEditInput = ({ target }, state) => {
+  const { value } = target;
+  const { uid } = state.feedEditFormState;
+  const currentValue = state.feeds.byUID[uid].url;
+  if (value === currentValue) {
+    setState(state, 'feedEditFormState', { ...state.feedEditFormState, value, state: 'valid' });
+    return;
+  }
+  setState(state, 'feedEditFormState', {
+    ...state.feedEditFormState,
+    value,
+    state: isURLValid(state, value) ? 'valid' : 'invalid',
+  });
+};
+
+const handleEditFormSubmit = (event, state) => {
+  event.preventDefault();
+  const formState = state.feedEditFormState;
+  const { uid } = formState;
+  if (formState.state !== 'valid') return;
+  setState(state, `feeds.byUID.${uid}`, { uid, url: formState.value, status: 'loading' });
+  closeFeedEditForm(state);
+  loadFeed(state, uid);
+};
+
 const enable = (state) => {
-  document
-    .getElementById('addFeedForm')
-    .addEventListener('submit', event => handleFormSubmit(event, state));
-  document
-    .getElementById('addFeedInput')
-    .addEventListener('input', event => handleFormInput(event, state));
-  document
-    .getElementById('closeFeedDetailButton')
-    .addEventListener('click', () => hideFeedDetail(state));
-  document
-    .getElementById('closeFeedDetailHeaderButton')
-    .addEventListener('click', () => hideFeedDetail(state));
+  [
+    ['addFeedForm', 'submit', event => handleFormSubmit(event, state)],
+    ['addFeedInput', 'input', event => handleFormInput(event, state)],
+    ['closeFeedDetailButton', 'click', () => hideFeedDetail(state)],
+    ['closeFeedDetailHeaderButton', 'click', () => hideFeedDetail(state)],
+    ['feedUpdateForm', 'submit', event => handleEditFormSubmit(event, state)],
+    ['feedUpdateInput', 'input', event => handleFeedEditInput(event, state)],
+    ['closeFeedUpdateHeaderButton', 'click', () => closeFeedEditForm(state)],
+    ['closeFeedUpdateButton', 'click', () => closeFeedEditForm(state)],
+  ].forEach(([id, event, func]) => document.getElementById(id).addEventListener(event, func));
   setTimeout(() => updateFeeds(state), listUpdateInterval);
 };
 
 export default enable;
-export { showFeedDetail, reloadFeed };
+export { showFeedDetail, reloadFeed, openFeedEditForm };
