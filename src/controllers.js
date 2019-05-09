@@ -37,7 +37,6 @@ const handleFormSubmit = (event, state) => {
 };
 
 const updateFeeds = (state) => {
-  console.log('Time to update content.');
   const { feeds } = state;
 
   const tasks = feeds.allURLs.map(url => load(url).catch(() => {}));

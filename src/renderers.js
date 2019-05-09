@@ -52,7 +52,6 @@ const renderFeed = ({
 );
 
 const renderAllFeeds = (state) => {
-  console.log('Render all the feeds triggered!');
   const container = document.getElementById('feedsDataContainer');
   while (container.firstChild) container.removeChild(container.firstChild);
   buildTree(
