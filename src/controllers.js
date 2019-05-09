@@ -17,8 +17,11 @@ const handleFormInput = ({ target: { value } }, { form, feeds: { allURLs } }) =>
 const handleFormSubmit = (event, state) => {
   event.preventDefault();
   const { feeds, form } = state;
+
   if (form.state !== 'valid') return;
+
   form.state = 'loading';
+
   const url = form.value;
   load(url)
     .then((feed) => {
@@ -36,7 +39,9 @@ const handleFormSubmit = (event, state) => {
 const updateFeeds = (state) => {
   console.log('Time to update content.');
   const { feeds } = state;
+
   const tasks = feeds.allURLs.map(url => load(url).catch(() => {}));
+
   Promise.all(tasks).then((loaded) => {
     // TODO: `data` is a bad name, replace with something meaningful
     const data = { ...feeds.byURL };
@@ -45,6 +50,7 @@ const updateFeeds = (state) => {
       .forEach(({ url, content }) => {
         data[url].content = _.unionWith(data[url].content, content, _.isEqual);
       });
+
     if (!_.isEqual(feeds.byURL, data)) feeds.byURL = data;
     setTimeout(() => updateFeeds(state), listUpdateInterval);
   });
