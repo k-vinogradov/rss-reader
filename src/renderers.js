@@ -18,20 +18,28 @@ const buildTree = (root, ...children) => {
   return root;
 };
 
-const setFormParams = (classAction, value, disabled) => {
-  const input = document.getElementById('addFeedInput');
-  input.classList[classAction]('is-invalid');
-  input.value = value;
-  document.getElementById('addFeedButton').disabled = disabled;
-  $('#loadingModal').modal('hide');
-};
+const renderLoading = ({ loading }) => $('#loadingModal').modal(loading ? 'show' : 'hide');
 
-const renderForm = ({ form: { state, value } }) => ({
-  init: () => setFormParams('remove', '', true),
-  invalid: () => setFormParams('add', value, true),
-  valid: () => setFormParams('remove', value, false),
-  loading: () => $('#loadingModal').modal('show'),
-}[state]());
+const renderForm = ({ form: { state, value } }) => {
+  const input = document.getElementById('addFeedInput');
+  const button = document.getElementById('addFeedButton');
+  input.value = value;
+  switch (state) {
+    case 'init':
+      input.classList.remove('is-invalid');
+      button.disabled = true;
+      break;
+    case 'invalid':
+      input.classList.add('is-invalid');
+      button.disabled = true;
+      break;
+    case 'valid':
+      input.classList.remove('is-invalid');
+      button.disabled = false;
+      break;
+    default:
+  }
+};
 
 const renderListItem = ({ title, link, description }, state) => {
   const detailButton = createElement('button', 'Detail...');
@@ -45,7 +53,11 @@ const renderFeed = ({
   title, description, content, url,
 }, state) => buildTree(
   createElement('li', '', 'feed'),
-  createElement('h2', title),
+  buildTree(
+    createElement('h2'),
+    createElement('span', `${title} `),
+    createElement('span', `${content.length}`, 'badge', 'badge-secondary'),
+  ),
   createElement('small', url),
   createElement('p', description),
   buildTree(createElement('ul'), ...content.map(item => renderListItem(item, state))),
@@ -54,8 +66,7 @@ const renderFeed = ({
 const renderAllFeeds = (state) => {
   const container = document.getElementById('feedsDataContainer');
   while (container.firstChild) container.removeChild(container.firstChild);
-  buildTree(
-    container,
+  container.appendChild(
     buildTree(
       document.createElement('ul'),
       ...state.feeds.allURLs.map(url => renderFeed(state.feeds.byURL[url], state)),
@@ -90,6 +101,7 @@ const enable = (state) => {
   WatchJS.watch(state, 'feeds', () => renderAllFeeds(state));
   WatchJS.watch(state, 'detail', () => renderDetail(state));
   WatchJS.watch(state, 'error', () => renderError(state));
+  WatchJS.watch(state, 'loading', () => renderLoading(state));
   renderForm(state);
 };
 

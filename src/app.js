@@ -7,6 +7,7 @@ const app = () => {
     feeds: { allURLs: [], byURL: {} },
     error: null,
     detail: null,
+    loading: false,
   };
 
   enableRenderers(state);

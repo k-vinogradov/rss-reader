@@ -17,11 +17,8 @@ const handleFormInput = ({ target: { value } }, { form, feeds: { allURLs } }) =>
 const handleFormSubmit = (event, state) => {
   event.preventDefault();
   const { feeds, form } = state;
-
   if (form.state !== 'valid') return;
-
-  form.state = 'loading';
-
+  state.loading = true;
   const url = form.value;
   load(url)
     .then((feed) => {
@@ -32,25 +29,33 @@ const handleFormSubmit = (event, state) => {
     })
     .catch((error) => {
       state.error = { url, reason: error.message };
-      form.state = 'valid';
+    })
+    .finally(() => {
+      state.loading = false;
     });
 };
 
 const updateFeeds = (state) => {
   const { feeds } = state;
-
   const tasks = feeds.allURLs.map(url => load(url).catch(() => {}));
-
-  Promise.all(tasks).then((loaded) => {
-    // TODO: `data` is a bad name, replace with something meaningful
-    const data = { ...feeds.byURL };
+  Promise.all(tasks).then(async (loaded) => {
+    let updated = false;
     loaded
       .filter(item => item !== undefined)
       .forEach(({ url, content }) => {
-        data[url].content = _.unionWith(data[url].content, content, _.isEqual);
+        const newContent = _.unionWith(feeds.byURL[url].content, content, _.isEqual);
+        if (!_.isEqual(feeds.byURL[url].content, newContent)) {
+          feeds.byURL[url].content = newContent;
+          updated = true;
+        }
       });
-
-    if (!_.isEqual(feeds.byURL, data)) feeds.byURL = data;
+    /*
+      Because of Watch.JS issue (https://github.com/melanke/Watch.JS/issues/129)
+      we have to recreate byURL attribute to invoke the render
+    */
+    if (updated) {
+      feeds.byURL = { ...feeds.byURL };
+    }
     setTimeout(() => updateFeeds(state), listUpdateInterval);
   });
 };
