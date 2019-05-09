@@ -32,15 +32,43 @@
       </div>
       </div>
     </div>
+    <div class="collapse" id="error">
+      <div class="card card-body">
+          <h5 class="text-danger">Error</h5>
+          <p>
+            Failed to load feed by the URL
+            <strong id="error.url"></strong>
+            due the following reason:
+          </p>
+          <p>
+            <strong id="error.reason"></strong>
+          </p>
+      </div>
+    </div>
     <div class="row">
       <div class="col" id="feedsDataContainer"></div>
     </div>
-    
+
+    <!-- LOADING MODAL -->
+
+    <div class="modal" tabindex="-1" role="dialog" id="loadingModal" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">
+                <span class="spinner-border" role="status" aria-hidden="true"></span>
+                Loading
+              </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+
     <!-- FEED DETAIL MODAL -->
     
     <div class="row">
       <div class="modal" id="feedDetail" tabindex="-1" role="dialog" aria-labelledby="feedDetailLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="feedDetailLabel"></h5>
@@ -52,39 +80,6 @@
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" id="closeFeedDetailButton">Close</button>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- UPDATE FEED FORM MODAL -->
-
-    <div class="row">
-      <div class="modal" id="feedUpdate" tabindex="-1" role="dialog" aria-labelledby="feedUpdateLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="feedUpdateLabel">Update Feed</h5>
-              <button type="button" class="close" aria-label="Close" id="closeFeedUpdateHeaderButton">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <form id="feedUpdateForm">
-              <div class="modal-body">
-                <input
-                  type="text"
-                  id="feedUpdateInput"
-                  class="form-control"
-                  placeholder="Enter RSS feed URL"
-                  aria-label="RSS feed"
-                  aria-describedby="updateFeedButton"
-                />
-              </div>
-              <div class="modal-footer">
-                  <button class="btn btn-primary" type="submit" id="updateFeedButton">Update</button>
-                <button type="button" class="btn btn-secondary" id="closeFeedUpdateButton">Cancel</button>
-              </div>
-            </form>
           </div>
         </div>
       </div>

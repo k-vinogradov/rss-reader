@@ -1,6 +1,6 @@
 {
   "name": "rss-reader",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "RSS reader as a Hexlet student project",
   "private": true,
   "repository": {
@@ -21,6 +21,7 @@
   "homepage": "https://github.com/k-vinogradov/project-lvl3-s452#readme",
   "devDependencies": {
     "@babel/core": "^7.4.3",
+    "@types/bootstrap": "^4.3.0",
     "autoprefixer": "^9.5.1",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.5",

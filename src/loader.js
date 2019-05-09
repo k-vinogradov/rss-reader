@@ -26,7 +26,7 @@ const load = (url) => {
   return axios.get(proxyUrl).then(({ data }) => {
     const feedObject = parse(data);
     if (feedObject === null) throw Error('Invalid RSS data');
-    return feedObject;
+    return { ...feedObject, url };
   });
 };
 

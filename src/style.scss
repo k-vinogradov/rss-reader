@@ -17,14 +17,6 @@ div#feedsDataContainer {
       .url {
         @extend .small;
       }
-      .spinner {
-        @extend .spinner-border, .spinner-border-sm, .mr-2;
-      }
-    }
-    li.errorFeed {
-      h2 {
-        @extend .text-danger;
-      }
     }
   }
 }
